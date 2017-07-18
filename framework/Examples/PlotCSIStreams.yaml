@@ -1,0 +1,31 @@
+StepPlotCSIStreams_Demux:
+StepCSIRead_Input:
+  device_type: iwl5300
+  raw_input: E:\csi_research\framework\data\log.all_csi.6.7.6
+
+StepPlot3DSurface_R1:
+  display_plot: False
+  export_directory: E:\csi_research\framework\data\
+
+StepPlot3DSurface_R2:
+  display_plot: False
+  export_directory: E:\csi_research\framework\data\
+
+StepPlot3DSurface_R3:
+  display_plot: False
+  export_directory: E:\csi_research\framework\data\
+
+SelectCSIStreams_ChildStep1:
+StepPlot3DSurface_ChildStep:
+  display_plot: True
+  export_directory: E:\csi_research\framework\data\
+
+StepStreamsPlotComp_ParentStep1:
+  plot_setting: All
+
+StepStreamsPlotComp_ParentStep:
+  plot_setting: Individual # or All
+  plots:
+    - 1x1
+    - 2x1
+    - 3x3

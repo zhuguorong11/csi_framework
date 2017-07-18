@@ -1,0 +1,9 @@
+BlockCSIStream_input:
+  device_type: iwl5300
+  stream_src: ../../data/csi.dat
+  sample_rate: 5
+BlockSelect_selector:
+  stream_1: 1x1x10
+  stream_2: 1x3x20
+BlockPlot_plot:
+  title: Live Stream

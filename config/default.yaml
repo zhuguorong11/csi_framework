@@ -1,0 +1,12 @@
+global:
+  title: My Rails Website
+  author: Santa Claus
+  email: email@company.com
+  css_file: default.css
+StepA:
+  param_1: 33
+  param_2: Daniel
+  param_3: Testing
+StepSVMTest:
+  kernel_type: 0 #LINEAR
+  C: 10
