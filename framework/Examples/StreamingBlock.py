@@ -33,7 +33,7 @@ class BlockCSIRead(SourceBlock):
             print('Sleeping for next broadcast...')
             time.sleep(5)
 
-    def _set_configuration(self, config : Configuration):
+    def _set_configuration(self, config: Configuration):
         return True
 
 class BlockTransform(TransformBlock):
@@ -53,7 +53,7 @@ class BlockTransform(TransformBlock):
             #raise Exception('FAILED TRANFORM BLOCK')
             return False
 
-    def _set_configuration(self, config : Configuration):
+    def _set_configuration(self, config: Configuration):
         return True
 
 class BlockSink(SinkBlock):

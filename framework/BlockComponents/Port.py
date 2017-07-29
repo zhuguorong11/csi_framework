@@ -24,7 +24,6 @@ class StreamChannel(ChannelBase):
     def __init__(self):
         super().__init__()
         self.mData = Queue()
-    #   print('Queue SetUp::', self.mData.full()) This works well, but not implemented yet! check for wait signal.
 
     def put(self, val):
         self.mData.put(val, block=True)
@@ -36,7 +35,7 @@ class StreamChannel(ChannelBase):
         return self.mData.qsize()
 
 class MatrixChannel(ChannelBase):
-    def __init__(self, dims, type=complex):
+    def __init__(self, dims, type = complex):
         super().__init__()
         self.sharedData = sm.sharedmem.empty(dims, dtype=type)
         self.lock = Lock()
@@ -60,6 +59,7 @@ class MatrixChannel(ChannelBase):
         return len(self.sharedData)
 
 class OutPort:
+
     def connect_port(self, inPort):
         try:
             inPort.set_channel(self._dataChannel, self._channelType)
@@ -161,11 +161,3 @@ class PortList:
             if port.is_connected() == False:
                 return False
         return True
-
-'''
-inp = InPort(ChannelType.STREAM)
-outp = OutPort(ChannelType.STREAM)
-outp.connect_port(inp)
-outp.put('new')
-print('read:', inp.get())
-'''

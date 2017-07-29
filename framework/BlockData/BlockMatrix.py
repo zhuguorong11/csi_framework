@@ -46,7 +46,7 @@ class BlockData(np.ndarray, metaclass=ABCMeta):
     def load(self, aFilePath, ioHandle = PickleFile()):
         self.set(ioHandle.Read(aFilePath))
 
-class csiSequence(BlockData):
+class csiStream(BlockData):
     def __new__(cls, s):
 
         # Set object information here
@@ -163,7 +163,7 @@ class csiMatrix(BlockData):
         self[:, :, :, frameIndex] = arrFrame
 
     def get_stream(self, trans, recv, subIndex):
-        sequence = csiSequence(self.frms)
+        sequence = csiStream(self.frms)
         sequence.set(self[trans, recv, subIndex, :]) #.copy()
         return sequence
 
@@ -187,7 +187,6 @@ class csiMatrix(BlockData):
 class fMatrix(BlockData):
     def __new__(cls, samples, features):
         # Set object information here
-       # obj = super().__new__(cls, samples, 'int32, ' + str(features) + 'float32')
         obj = super().__new__(cls, (samples, features), float)
         obj.samples = samples
         obj.features = features
@@ -221,57 +220,3 @@ class fMatrix(BlockData):
 
     def set(self, fMatrix):
         self[...] = fMatrix
-"""
-test1 = fMatrix(10, 3)
-test = fMatrix(10, 3)
-
-test.fill(10)
-test1.Set(test)
-# print(test1.GetFeatures())
-a = csiStream(10)
-a.fill(1)
-print(a)
-
-# a.Store('new.pkl')
-# a.Load('new.pkl')
-
-#print(x)
-
-z = frameMatrix(3, 3, 30)
-x = frameMatrix(3, 3, 30)
-x.fill(4)
-np.save('test',x)
-z = np.load('test.npy')
-# x.Store('data.pkl')
-# z.Load('data.pkl')
-print(z)
-# z.Set(x)
-# print(z)
-
-x = csiMatrix(3, 3, 30, 10)
-y = csiMatrix(3, 3, 30, 10)
-x.fill(4)
-z = y.GetFrame(8)#.copy()
-# print(type(z))
-# print(z.shape)
-# z.fill(44)
-# y.SetFrame(8, z)
-test = y.GetSegment(8, 9)
-# print(z.shape)
-z.fill(22)
-# test.fill(33)
-# print(y[:,:,:,8])
-# print(z.k)
-# print(test.shape)
-# y.SetSegment(test, 8, 10) # [8, 10)
-
-# print(y[:,:,:,9])
-y.fill(6)
-x.fill(5)
-
-x = np.multiply(x,y)
-# print(x.GetFrame(3))
-# print(frameMatrix(1,5,1))
-x.SetFrame(3, z)
-# print(x[:,:,:,3])
-"""

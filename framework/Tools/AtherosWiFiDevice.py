@@ -1,10 +1,6 @@
-import numpy as np
-import functools as func
-import matplotlib.pyplot as plt
 from Tools.ExtractorService import *
 from BlockData.BlockMatrix import *
 
-import sys
 import struct
 import os
 
@@ -47,7 +43,6 @@ class Atheros_ATH9K_API():
         fileLength = f.tell()
         f.seek(0, os.SEEK_SET)
 
-        #print('file length is:', fileLength)
         endianCode = struct.unpack('B', f.read(1))[0]
 
         if endianCode == 255:
@@ -108,17 +103,15 @@ class Atheros_ATH9K_API():
                 csi_buf = f.read(csi_len)
                 csi = self.__parse_to_symbol(csi_buf, nr, nc, num_tones)
 
-                # @@@@ Place holder code
+                # @@@@
                 csiSymbol['csi'] = csi
-                # @@@@ Place holder code
 
                 cur += csi_len
-                # print('csi_values are:', csi)
             else:
                 csiSymbol['csi'] = None
 
             if payload_len > 0:
-                data_buf = f.read(payload_len)  # struct.unpack(eF+'B', f.read(payload_len))[0]
+                data_buf = f.read(payload_len)
                 cur += payload_len
                 csiSymbol['payload'] = data_buf
             else:
@@ -147,11 +140,9 @@ class Atheros_ATH9K_API():
         h_data += (bytes[idx] << bits_per_byte) & 255
         current_data = h_data & ((1 << 16) - 1)
 
-        # @@@ Finish parsing code here @@@
-        # create empty place holder for now with random data in the correct format
-        #mtrx = np.zeros((56, 2, 3), complex) # carriers, transmit, receiver
+        # @@@
+        mtrx = np.zeros((56, 2, 3), complex) # carriers, transmit, receiver
         mtrx = np.random.rand(56, 2, 3)
-        # print(mtrx)
         return mtrx
 
     def __convert_to_total_RSS(self, symbol):
@@ -242,8 +233,3 @@ class AtherosDeviceService(ExtractorService):
 
         return 10 * np.log10(rssi_mag) - 44 - symbol['noise_floor']
 
-#test = AtherosDeviceExtractor()
-#test.ExtractFromFile('../../data/ath_data.dat')
-
-#print(len(test._deviceSymbolData))
-#print(test.GetScaledRSSI())

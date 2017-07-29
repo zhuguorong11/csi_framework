@@ -3,7 +3,6 @@ from BlockComponents.Configuration import *
 from BlockComponents.Port import *
 from framework.BlockData.BlockMatrix import *
 
-
 # Force reference passing on immutable data.
 class DataWrapper:
     def __init__(self, val=None):
@@ -30,7 +29,7 @@ class BlockBase (Process, metaclass=ABCMeta):
         if self._mBlockState == BlockStatus.RUNNING:
             print('Block Terminated ', self.blockName)
             super().terminate()
-            self._mBlockState = BlockStatus.UNCONFIGURED # After failure, force complete reset.
+            self._mBlockState = BlockStatus.UNCONFIGURED
         else:
             raise Exception('Process is not running')
 

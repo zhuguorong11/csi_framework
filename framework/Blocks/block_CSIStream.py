@@ -83,7 +83,7 @@ class BlockPlot(SinkBlock):
         self.pipe2 = pipe2
 
     def scale(self, data):
-        s1 = csiSequence(10)
+        s1 = csiStream(10)
         s1.set(data)
         s1 = np.absolute(data)
         s1[s1 < 1] = np.nan

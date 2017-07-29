@@ -4,12 +4,14 @@ from Tools.ExtractorService import *
 from BlockData.BlockMatrix import *
 import struct
 import os, time
+from io import StringIO
 
 class Intel_IWL5300_API():
     def __init__(self):
         self.deviceDriverName = 'INTEL_IWL5300'
         self.deviceSubCarriers = 30
         self.deviceSymbolData = []
+        self.streamFile = None
 
     @staticmethod
     def to_db(aValue):
@@ -28,17 +30,38 @@ class Intel_IWL5300_API():
         self.__parse_symbol_file(filePath)
 
     def open_stream(self, source):
-        # Need to parse file here in stages using the tail -f method developed prior
-        self.open(source)
+        if not self.streamFile:
+            try:
+                self.streamFile = open(source, "rb")
+                st_results = os.stat(source)
+                st_size = st_results[6]
+                self.streamFile.seek(st_size)
+            except IOError as e:
+                return False
 
+        self.where = self.streamFile.tell()
+        line = self.streamFile.readline()
+
+        while not line:
+            self.streamFile.seek(self.where)
+            time.sleep(.01)
+
+            self.where = self.streamFile.tell()
+            line = self.streamFile.readline()
+
+
+        return self.__parse_symbol_file(StringIO(line))
 
     def __parse_symbol_file(self, aFilePath):
-        try:
-            f = open(aFilePath, "rb")
-        except IOError as e:
-            print(e.errno)
-            print(e)
-            return False
+
+        # make sure we only open when not streaming
+        if isinstance(aFilePath, str):
+            try:
+                f = open(aFilePath, "rb")
+            except IOError as e:
+                print(e.errno)
+                print(e)
+                return False
 
         # seek end of file
         f.seek(0, os.SEEK_END)
@@ -114,7 +137,8 @@ class Intel_IWL5300_API():
         rssi_a = bytes[10]
         rssi_b = bytes[11]
         rssi_c = bytes[12]
-        noise = -(bytes[13] & 2 ** (8 - 1)) + (bytes[13] & ~2 ** (8 - 1))  # Unsigned, two's complement
+        # Unsigned, two's complement
+        noise = -(bytes[13] & 2 ** (8 - 1)) + (bytes[13] & ~2 ** (8 - 1))
         agc = bytes[14]
         antenna_sel = bytes[15]
         length = bytes[16] + (bytes[17] << 8)
@@ -123,8 +147,10 @@ class Intel_IWL5300_API():
 
         csi = []
         index = 0
-        ptr = 20  # Starting offset for payload
-        perm = []  # Premutation array
+        # Starting offset for payload
+        ptr = 20
+        # Premutation array
+        perm = []
 
         if calc_len != length:
             print("Lengths don't match!")
@@ -135,9 +161,10 @@ class Intel_IWL5300_API():
             index += 3
             remainder = index % 8
             for j in range(nrx * ntx):
-                tmp1 = (bytes[ptr + int(index / 8)] >> remainder) & 255  # Only care about 1 byte
-                tmp2 = (bytes[ptr + int(index / 8) + 1] << (
-                8 - remainder)) & 255  # Python bit width isn't fixed!
+                # Only care about 1 byte
+                tmp1 = (bytes[ptr + int(index / 8)] >> remainder) & 255
+                # Python bit width isn't fixed!
+                tmp2 = (bytes[ptr + int(index / 8) + 1] << (8 - remainder)) & 255
                 re = self._twos_comp(tmp1 | tmp2)
 
                 tmp1 = (bytes[ptr + int(index / 8) + 1] >> remainder) & 255
@@ -170,7 +197,7 @@ class Intel_IWL5300_API():
 
         return 10*np.log10(rssi_mag) - 44 - symbol['agc']
 
-    def __scale_csi_to_ref(self, parsedData): # Already a Numpy Array
+    def __scale_csi_to_ref(self, parsedData):
         csi = parsedData['csi']
         csi_sqr = csi * np.conjugate(csi)
         csi_pwr = np.sum(csi_sqr)
@@ -238,7 +265,8 @@ class IntelDeviceService(ExtractorService):
         return self._mDriver.deviceSubCarriers
 
     def get_receiver_count(self):
-        return self._mDriver.deviceSymbolData[0]['Nrx'] # Count must be the same for all symbols
+        return self._mDriver.deviceSymbolData[0]['Nrx']
+        # Count must be the same for all symbols
 
     def get_transmitter_count(self):
         return self._mDriver.deviceSymbolData[0]['Nrx']
@@ -301,16 +329,3 @@ class IntelDeviceService(ExtractorService):
             rssi_mag += self.InvDb(symbol['rssi_c'])
 
         return 10*np.log10(rssi_mag) - 44 - symbol['agc']
-
-# test = IntelDeviceExtractor(Intel_IWL5300_API())
-# test.Open('../../data/log.all_csi.6.7.  6')
-# test.ConvertToCSIMatrix()
-
-#print(test.)
-
-# test = IntelDeviceExtractor()
-# test.ParseSymbolFile('../../data/log.all_csi.6.7.6')
-
-# print(test._deviceSymbolData)
-# print(test.GetCSISymbols()[0].shape)
-# print(test.__ScaleCSIToRef(test._deviceSymbolData[0]))

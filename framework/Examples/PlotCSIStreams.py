@@ -7,6 +7,9 @@ from matplotlib import pyplot as plt
 from matplotlib import cm
 import numpy as np
 
+# One improvement is stricter type checking here
+# Also we have a fixed number of ports
+
 # Sample application that demonstrates the Step, Step composite, and network advantage
 class StepCSIRead(SourceStep):
     def __init__(self, aProcessID):

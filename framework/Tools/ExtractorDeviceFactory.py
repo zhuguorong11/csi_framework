@@ -11,6 +11,3 @@ class WiFiDeviceFactory():
             return AtherosDeviceService(Atheros_ATH9K_API())
         else:
             raise NotImplementedError('The requested device class has not been implemented!')
-
-#test = WiFiDeviceFactory.CreateDevice('ath9k')
-#test.Open('../../data/ath_data.dat')

@@ -1,9 +1,5 @@
-from abc import abstractmethod
 from framework.BlockComponents.Configuration import *
-from multiprocessing import active_children
 from threading import Thread
-
-import time
 
 class NetworkExecBase():
     def __init__(self):
@@ -45,6 +41,7 @@ class Network:
 
         for blockID, block in self._blockMap.items():
             if block.is_connected() is False:
+                self.terminate()
                 raise Exception('Unconnected block ', block.blockName)
             else:
                 t = Thread(target=self._monitor_block, args=(block,))
@@ -54,8 +51,6 @@ class Network:
 
         for t in self._monitorThreads:
             t.join()
-            # print('Active Childeren:', active_children())
-
 
     def _monitor_block(self, node):
         node.start()
